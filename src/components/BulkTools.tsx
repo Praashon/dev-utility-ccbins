@@ -106,9 +106,10 @@ export default function BulkTools() {
     };
   }, [status, queue]);
 
-  const extractAndUse = (cardInfo: string) => {
-    if (advancedCheckerRef.current) {
-      advancedCheckerRef.current.addCards([cardInfo]);
+  const extractAndUseAll = (cards: CheckResult[]) => {
+    if (advancedCheckerRef.current && cards.length > 0) {
+      const cardInfos = cards.map(c => c.cardInfo);
+      advancedCheckerRef.current.addCards(cardInfos);
       
       const el = document.getElementById("advanced-checker-section");
       if (el) {
@@ -361,27 +362,31 @@ export default function BulkTools() {
                  No results yet.
               </div>
             ) : (
-              results[activeTab.toLowerCase() as keyof typeof results].map((res, idx) => (
-                <div key={idx} className="flex items-center mb-2 whitespace-nowrap animate-in fade-in slide-in-from-left-4 duration-300">
-                  <span className={`w-16 ${res.status === 'Live' ? 'text-acid' : res.status === 'Die' ? 'text-red-500' : 'text-yellow-500 font-bold'}`}>
-                    {res.status}
-                  </span>
-                  <span className="text-zinc-600 mx-2">|</span>
-                  <span className="text-zinc-300 mr-4">{res.cardInfo}</span>
-                  <span className="text-zinc-500">|</span>
-                  <span className="text-zinc-400 mx-4">[BIN: 🇺🇸 - {res.network} - credit]</span>
-                  <span className="text-zinc-500">|</span>
-                  <span className="text-zinc-400 ml-4 flex-1">{res.message}</span>
-                  {activeTab === "Live" && (
+              <>
+                {activeTab === "Live" && (
+                  <div className="sticky top-0 right-0 z-10 flex justify-end mb-4">
                     <button 
-                      onClick={() => extractAndUse(res.cardInfo)}
-                      className="ml-4 text-[10px] font-bold tracking-widest uppercase bg-[#00ffbb]/10 text-[#00ffbb] border border-[#00ffbb]/50 px-2 py-1 hover:bg-[#00ffbb] hover:text-black transition-colors"
+                      onClick={() => extractAndUseAll(results.live)}
+                      className="text-xs text-[#00ffbb] border border-[#00ffbb] bg-black/80 backdrop-blur-md px-3 py-2 hover:bg-[#00ffbb] hover:text-black transition-colors font-bold uppercase tracking-widest"
                     >
-                      Send to Checker
+                      Send All to Checker
                     </button>
-                  )}
-                </div>
-              ))
+                  </div>
+                )}
+                {results[activeTab.toLowerCase() as keyof typeof results].map((res, idx) => (
+                  <div key={idx} className="flex items-center mb-2 whitespace-nowrap animate-in fade-in slide-in-from-left-4 duration-300">
+                    <span className={`w-16 ${res.status === 'Live' ? 'text-acid' : res.status === 'Die' ? 'text-red-500' : 'text-yellow-500 font-bold'}`}>
+                      {res.status}
+                    </span>
+                    <span className="text-zinc-600 mx-2">|</span>
+                    <span className="text-zinc-300 mr-4">{res.cardInfo}</span>
+                    <span className="text-zinc-500">|</span>
+                    <span className="text-zinc-400 mx-4">[BIN: 🇺🇸 - {res.network} - credit]</span>
+                    <span className="text-zinc-500">|</span>
+                    <span className="text-zinc-400 ml-4 flex-1">{res.message}</span>
+                  </div>
+                ))}
+              </>
             )
           )}
         </div>
