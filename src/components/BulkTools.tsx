@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { generateMass, MassGeneratorOptions, validateCard, CheckResult } from "@/lib/card-utils";
 import { Play, Pause, Square, Settings, CreditCard } from "lucide-react";
+import AdvancedChecker, { AdvancedCheckerRef } from "./AdvancedChecker";
+import { useRef } from "react";
 
 export default function BulkTools() {
   const [options, setOptions] = useState<MassGeneratorOptions>({
@@ -33,6 +35,8 @@ export default function BulkTools() {
   const [status, setStatus] = useState<"idle" | "checking" | "paused" | "finished">("idle");
   const [activeTab, setActiveTab] = useState<"Generated" | "Live" | "Die" | "Unknown">("Generated");
   const [isHydrated, setIsHydrated] = useState(false);
+  
+  const advancedCheckerRef = useRef<AdvancedCheckerRef>(null);
 
   useEffect(() => {
     const saved = sessionStorage.getItem("bulkToolsState");
@@ -103,28 +107,13 @@ export default function BulkTools() {
   }, [status, queue]);
 
   const extractAndUse = (cardInfo: string) => {
-    const parts = cardInfo.split('|');
-    if (parts.length >= 4) {
-      const pan = parts[0];
-      const mm = parts[1];
-      const yy = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
-      const cvv = parts[3];
-
-      setOptions(prev => ({
-        ...prev,
-        bin: pan.substring(0, 6),
-        month: mm,
-        year: yy,
-        cvv: cvv
-      }));
-
-      setToggles(prev => ({
-        ...prev,
-        date: true,
-        cvv: true
-      }));
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    if (advancedCheckerRef.current) {
+      advancedCheckerRef.current.addCards([cardInfo]);
+      
+      const el = document.getElementById("advanced-checker-section");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
 
@@ -386,9 +375,9 @@ export default function BulkTools() {
                   {activeTab === "Live" && (
                     <button 
                       onClick={() => extractAndUse(res.cardInfo)}
-                      className="ml-4 text-[10px] font-bold tracking-widest uppercase bg-acid/10 text-acid border border-acid/50 px-2 py-1 hover:bg-acid hover:text-black transition-colors"
+                      className="ml-4 text-[10px] font-bold tracking-widest uppercase bg-[#00ffbb]/10 text-[#00ffbb] border border-[#00ffbb]/50 px-2 py-1 hover:bg-[#00ffbb] hover:text-black transition-colors"
                     >
-                      Use BIN
+                      Send to Checker
                     </button>
                   )}
                 </div>
@@ -398,6 +387,7 @@ export default function BulkTools() {
         </div>
       </div>
 
+      <AdvancedChecker ref={advancedCheckerRef} />
     </div>
   );
 }
