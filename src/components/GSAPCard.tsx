@@ -39,7 +39,7 @@ export default function GSAPCard({ card }: GSAPCardProps) {
       style={{ transformStyle: 'preserve-3d' }}
     >
       {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-acid opacity-10 blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+      <div className="absolute top-0 right-0 w-64 h-64 bg-acid rounded-full opacity-5 blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
       
       {/* Top row */}
       <div className="flex justify-between items-start z-10 w-full">

@@ -102,6 +102,32 @@ export default function BulkTools() {
     };
   }, [status, queue]);
 
+  const extractAndUse = (cardInfo: string) => {
+    const parts = cardInfo.split('|');
+    if (parts.length >= 4) {
+      const pan = parts[0];
+      const mm = parts[1];
+      const yy = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
+      const cvv = parts[3];
+
+      setOptions(prev => ({
+        ...prev,
+        bin: pan.substring(0, 6),
+        month: mm,
+        year: yy,
+        cvv: cvv
+      }));
+
+      setToggles(prev => ({
+        ...prev,
+        date: true,
+        cvv: true
+      }));
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const progressPercent = totalToCheck === 0 ? 0 : Math.max(0, Math.min(100, ((totalToCheck - queue.length) / totalToCheck) * 100));
 
   return (
@@ -347,7 +373,7 @@ export default function BulkTools() {
               </div>
             ) : (
               results[activeTab.toLowerCase() as keyof typeof results].map((res, idx) => (
-                <div key={idx} className="flex mb-2 whitespace-nowrap animate-in fade-in slide-in-from-left-4 duration-300">
+                <div key={idx} className="flex items-center mb-2 whitespace-nowrap animate-in fade-in slide-in-from-left-4 duration-300">
                   <span className={`w-16 ${res.status === 'Live' ? 'text-acid' : res.status === 'Die' ? 'text-red-500' : 'text-yellow-500 font-bold'}`}>
                     {res.status}
                   </span>
@@ -356,7 +382,15 @@ export default function BulkTools() {
                   <span className="text-zinc-500">|</span>
                   <span className="text-zinc-400 mx-4">[BIN: 🇺🇸 - {res.network} - credit]</span>
                   <span className="text-zinc-500">|</span>
-                  <span className="text-zinc-400 ml-4">{res.message}</span>
+                  <span className="text-zinc-400 ml-4 flex-1">{res.message}</span>
+                  {activeTab === "Live" && (
+                    <button 
+                      onClick={() => extractAndUse(res.cardInfo)}
+                      className="ml-4 text-[10px] font-bold tracking-widest uppercase bg-acid/10 text-acid border border-acid/50 px-2 py-1 hover:bg-acid hover:text-black transition-colors"
+                    >
+                      Use BIN
+                    </button>
+                  )}
                 </div>
               ))
             )

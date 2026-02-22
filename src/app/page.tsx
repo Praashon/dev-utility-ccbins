@@ -142,7 +142,7 @@ export default function Home() {
           
           {/* Left Panel: Card Gen */}
         <section className="bg-black p-8 lg:p-16 flex flex-col items-center justify-center relative overflow-hidden group">
-          <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-titanium rounded-full blur-[120px] opacity-10 group-hover:opacity-30 transition-opacity duration-1000 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+          <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-titanium rounded-full blur-[160px] opacity-5 group-hover:opacity-20 transition-opacity duration-1000 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
           
           <div className="z-10 mb-16 transform hover:scale-[1.02] hover:-translate-y-2 transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-pointer stagger-enter" onClick={() => copyToClipboard(card?.number || "")}>
             <GSAPCard card={card} />
