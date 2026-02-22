@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { generateMass, MassGeneratorOptions, validateCard, CheckResult } from "@/lib/card-utils";
 import { Play, Pause, Square, Settings, CreditCard } from "lucide-react";
 
@@ -32,6 +32,38 @@ export default function BulkTools() {
 
   const [status, setStatus] = useState<"idle" | "checking" | "paused" | "finished">("idle");
   const [activeTab, setActiveTab] = useState<"Generated" | "Live" | "Die" | "Unknown">("Generated");
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("bulkToolsState");
+    if (saved) {
+      setTimeout(() => {
+        try {
+           const parsed = JSON.parse(saved);
+           if (parsed.options) setOptions(parsed.options);
+           if (parsed.toggles) setToggles(parsed.toggles);
+           if (parsed.queue) setQueue(parsed.queue);
+           if (parsed.generatedList) setGeneratedList(parsed.generatedList);
+           if (parsed.totalToCheck) setTotalToCheck(parsed.totalToCheck);
+           if (parsed.results) setResults(parsed.results);
+           if (parsed.status) setStatus(parsed.status === "checking" ? "paused" : parsed.status);
+           if (parsed.activeTab) setActiveTab(parsed.activeTab);
+        } catch (error) {
+           console.error("Hydration error:", error);
+        }
+        setIsHydrated(true);
+      }, 0);
+    } else {
+      setTimeout(() => setIsHydrated(true), 0);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    sessionStorage.setItem("bulkToolsState", JSON.stringify({
+      options, toggles, queue, generatedList, totalToCheck, results, status, activeTab
+    }));
+  }, [options, toggles, queue, generatedList, totalToCheck, results, status, activeTab, isHydrated]);
 
   const handleGenerate = () => {
     if (!options.bin || options.bin.length < 6) return;
@@ -62,7 +94,7 @@ export default function BulkTools() {
         setQueue((prev) => prev.slice(1));
       }, 50); // Faster simulation speed
     } else if (status === "checking" && queue.length === 0) {
-      setStatus("finished");
+      setTimeout(() => setStatus("finished"), 0);
     }
 
     return () => {
