@@ -13,6 +13,7 @@ export interface AdvancedCheckResult {
 
 export interface AdvancedCheckerRef {
   addCards: (cards: string[]) => void;
+  clearAll: () => void;
 }
 
 const GATEWAYS = ["Stripe v3 (Auth)", "Braintree (Charge)", "Adyen (Auth)", "Authorize.Net"];
@@ -50,6 +51,18 @@ const AdvancedChecker = forwardRef<AdvancedCheckerRef>((props, ref) => {
         }
         return prev;
       });
+    },
+    clearAll: () => {
+      setQueue([]);
+      setResults({
+        charged: [],
+        auth: [],
+        declined: [],
+        unknown: []
+      });
+      setStatus("idle");
+      setTotalAdded(0);
+      setActiveTab("Queue");
     }
   }));
 

@@ -23,6 +23,11 @@ export default function Home() {
     // Generate initial card async to avoid hydration mismatch and sync setState error
     const timer = setTimeout(() => {
       setCard(generateCardData("visa"));
+
+      const storedEmail = sessionStorage.getItem("temp_email");
+      if (storedEmail) {
+        setEmail(storedEmail);
+      }
       
       // Animate page elements entering
       gsap.fromTo(
@@ -45,10 +50,18 @@ export default function Home() {
       const newEmail = await getTempEmail();
       setEmail(newEmail);
       setMessages([]);
+      sessionStorage.setItem("temp_email", newEmail);
     } catch (e) {
       console.error(e);
     }
     setLoading(false);
+  };
+
+  const handleClearEmail = () => {
+    setEmail(null);
+    setMessages([]);
+    setSelectedMessage(null);
+    sessionStorage.removeItem("temp_email");
   };
 
   const checkMail = async () => {
@@ -188,15 +201,25 @@ export default function Home() {
           <div className="mb-12 flex justify-between items-end stagger-enter">
             <div>
               <h2 className="text-4xl font-bold tracking-tighter text-white uppercase mb-4">Inbox Stream</h2>
-              <p className="text-zinc-500 max-w-sm font-mono text-sm leading-relaxed">Receive OTP payloads instantly. Session destroys on reload.</p>
+              <p className="text-zinc-500 max-w-sm font-mono text-sm leading-relaxed">Receive OTP payloads instantly. Session persists on reload.</p>
             </div>
-            <button 
-              onClick={handleGenEmail}
-              disabled={loading}
-              className="bg-acid text-black px-8 py-4 uppercase tracking-widest text-xs font-bold hover:bg-white transition-colors"
-            >
-              {loading ? "Allocating..." : "New Email"}
-            </button>
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              {email && (
+                <button 
+                  onClick={handleClearEmail}
+                  className="bg-black text-red-500 border border-titanium hover:border-red-500/50 hover:bg-red-500/10 px-8 py-4 uppercase tracking-widest text-xs font-bold transition-colors"
+                >
+                  Destroy Session
+                </button>
+              )}
+              <button 
+                onClick={handleGenEmail}
+                disabled={loading}
+                className="bg-acid text-black px-8 py-4 uppercase tracking-widest text-xs font-bold hover:bg-white transition-colors disabled:opacity-50"
+              >
+                {loading ? "Allocating..." : "New Email"}
+              </button>
+            </div>
           </div>
 
           <div className="border border-titanium flex-1 p-8 relative stagger-enter bg-black/50">

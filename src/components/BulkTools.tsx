@@ -106,6 +106,26 @@ export default function BulkTools() {
     };
   }, [status, queue]);
 
+  const clearAllData = () => {
+    setGeneratedList([]);
+    setQueue([]);
+    setResults({ live: [], die: [], unknown: [] });
+    setStatus("idle");
+    setOptions({
+      bin: "",
+      month: "Random",
+      year: "Random",
+      cvv: "",
+      format: "PIPE",
+      quantity: 10
+    });
+    setToggles({ date: true, cvv: true, money: false });
+    
+    if (advancedCheckerRef.current) {
+      advancedCheckerRef.current.clearAll();
+    }
+  };
+
   const extractAndUseAll = (cards: CheckResult[]) => {
     if (advancedCheckerRef.current && cards.length > 0) {
       const cardInfos = cards.map(c => c.cardInfo);
@@ -124,9 +144,17 @@ export default function BulkTools() {
     <div className="flex flex-col space-y-8 animate-in fade-in duration-700">
       
       {/* --- MASS GENERATOR FORM --- */}
-      <div className="border border-titanium bg-black p-8 relative">
+      <div className="border border-titanium bg-black p-8 relative mt-4">
         <div className="absolute -top-3 left-6 bg-black px-2 text-xs uppercase tracking-widest text-acid flex items-center">
           <Settings size={14} className="mr-2" /> Generator Config
+        </div>
+        <div className="absolute -top-3 right-6 flex items-center">
+          <button 
+            onClick={clearAllData}
+            className="bg-black px-3 text-[10px] py-0.5 uppercase tracking-widest text-red-500 hover:text-red-400 border border-titanium hover:border-red-500/50 transition-colors flex items-center font-bold"
+          >
+            Clear All
+          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
